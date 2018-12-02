@@ -1,0 +1,674 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package UI;
+
+import Class.Category;
+import Class.ConnectionProvider;
+import java.awt.Color;
+import java.awt.Image;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.table.DefaultTableModel;
+
+/**
+ *
+ * @author User
+ */
+public class Category_Window extends javax.swing.JFrame {
+
+    /**
+     * Creates new form Inventry_Window
+     */
+    public Category_Window() {
+        initComponents();
+        setVisible(true);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setLocationRelativeTo(null);
+        setExtendedState(java.awt.Frame.MAXIMIZED_BOTH);
+        showOnTable();
+        btn_update.setEnabled(false);
+        btn_delete.setEnabled(false);
+        
+        
+    }
+    
+    //Check input Fields
+    public boolean checkInputs(){
+    
+        if(!txt_CategoryName.getText().isEmpty()){
+            
+            if(!txt_description.getText().isEmpty()){
+                return true;
+            }
+            else{
+                JOptionPane.showMessageDialog(null, "Description Field cannot be Empty");
+                return false;
+            }
+        }        
+        else{
+            JOptionPane.showMessageDialog(null, "Category Name Field cannot be Empty");   
+            return false;
+        }           
+        
+    }
+
+    
+    //Display Date in JTable
+    // 1 - Fetch data from Database and store it in ArrayList
+    public ArrayList<Category> getCategories(){
+        
+        ArrayList<Category> CategoryList=new ArrayList<>();
+        Category category;
+        Connection con= ConnectionProvider.getInstance().getDBConnection();
+        String Query="SELECT * FROM category";
+            
+        try {
+            Statement stm=con.createStatement();
+            ResultSet rs=stm.executeQuery(Query);
+            
+            while(rs.next()){
+                category = new Category(rs.getInt("categoryid"), rs.getString("categoryname"),rs.getString("description"));
+                CategoryList.add(category);
+            }
+           
+        } catch (SQLException ex) {
+            //Logger.getLogger(Product_Window.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return CategoryList;
+        
+    }
+    
+    // 2 - Populate JTable
+    public void showOnTable(){
+    
+        ArrayList<Category> categoryList = getCategories();
+        DefaultTableModel model= (DefaultTableModel)jTable_Products.getModel();
+       
+        //To clear table before inserting, to avoid duplicate
+        model.setRowCount(0);
+        
+        Object[] row=new Object[3];
+        
+        for(int i=0;i<categoryList.size();i++){
+            row[0]=categoryList.get(i).getCategoryId();
+            row[1]=categoryList.get(i).getCategoryName();
+            row[2]=categoryList.get(i).getDescription();
+            
+            model.addRow(row);
+        }
+        
+    }
+    
+    public void showItems(int index){
+        
+        txt_CategoryId.setText(Integer.toString(getCategories().get(index).getCategoryId()));
+        txt_CategoryName.setText(getCategories().get(index).getCategoryName());
+        txt_description.setText(getCategories().get(index).getDescription());
+        
+    }
+    
+    public boolean checkAvailability(){
+        try {
+            String category_name=txt_CategoryName.getText();
+            
+            Connection con = ConnectionProvider.getInstance().getDBConnection();
+            String query="SELECT * FROM category WHERE categoryname='"+category_name+"'";
+            
+            PreparedStatement ps = con.prepareStatement(query);
+            ResultSet rs = ps.executeQuery();
+            
+            if(rs.next()){
+                JOptionPane.showMessageDialog(null, "Category Already Exists!!!");
+                return false;
+            }    
+            
+            else 
+                return true;
+            
+        } catch (SQLException ex) {
+            //Logger.getLogger(Category_Window.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        }
+        
+    }
+    
+    
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        jPanel1 = new javax.swing.JPanel();
+        jPanel2 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        txt_CategoryName = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        txt_description = new javax.swing.JTextArea();
+        jLabel7 = new javax.swing.JLabel();
+        txt_CategoryId = new javax.swing.JTextField();
+        btn_insert = new javax.swing.JButton();
+        btn_update = new javax.swing.JButton();
+        btn_delete = new javax.swing.JButton();
+        jLabel2 = new javax.swing.JLabel();
+        btn_clear = new javax.swing.JButton();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jTable_Products = new javax.swing.JTable();
+        btn_first = new javax.swing.JButton();
+        btn_previous = new javax.swing.JButton();
+        btn_next = new javax.swing.JButton();
+        btn_last = new javax.swing.JButton();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("NA | Category Window");
+
+        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
+
+        jPanel2.setBackground(new java.awt.Color(0, 31, 63));
+        jPanel2.setForeground(new java.awt.Color(255, 255, 255));
+
+        jLabel1.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel1.setText("Category ID");
+
+        jLabel3.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel3.setText("Description");
+
+        txt_description.setColumns(20);
+        txt_description.setRows(5);
+        jScrollPane1.setViewportView(txt_description);
+
+        jLabel7.setFont(new java.awt.Font("Calibri", 0, 18)); // NOI18N
+        jLabel7.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel7.setText("Category Name");
+
+        txt_CategoryId.setEnabled(false);
+        txt_CategoryId.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txt_CategoryIdActionPerformed(evt);
+            }
+        });
+
+        btn_insert.setBackground(new java.awt.Color(51, 102, 255));
+        btn_insert.setFont(new java.awt.Font("Calibri", 1, 24)); // NOI18N
+        btn_insert.setText("INSERT");
+        btn_insert.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        btn_insert.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_insertActionPerformed(evt);
+            }
+        });
+
+        btn_update.setBackground(new java.awt.Color(51, 102, 255));
+        btn_update.setFont(new java.awt.Font("Calibri", 1, 24)); // NOI18N
+        btn_update.setText("UPDATE");
+        btn_update.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        btn_update.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_updateActionPerformed(evt);
+            }
+        });
+
+        btn_delete.setBackground(new java.awt.Color(51, 102, 255));
+        btn_delete.setFont(new java.awt.Font("Calibri", 1, 24)); // NOI18N
+        btn_delete.setText("DELETE");
+        btn_delete.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        btn_delete.setBorderPainted(false);
+        btn_delete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_deleteActionPerformed(evt);
+            }
+        });
+
+        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Image/smart devices.jpg"))); // NOI18N
+
+        btn_clear.setText("CLEAR");
+        btn_clear.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_clearActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGap(62, 62, 62)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(btn_insert, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel3))
+                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(jPanel2Layout.createSequentialGroup()
+                                        .addGap(27, 27, 27)
+                                        .addComponent(btn_update, javax.swing.GroupLayout.PREFERRED_SIZE, 158, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 27, Short.MAX_VALUE)
+                                        .addComponent(btn_delete, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(jPanel2Layout.createSequentialGroup()
+                                        .addGap(62, 62, 62)
+                                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                            .addComponent(btn_clear)
+                                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addGap(0, 0, Short.MAX_VALUE))))
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addGroup(jPanel2Layout.createSequentialGroup()
+                                        .addComponent(jLabel1)
+                                        .addGap(121, 121, 121)
+                                        .addComponent(txt_CategoryId, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(jPanel2Layout.createSequentialGroup()
+                                        .addComponent(jLabel7)
+                                        .addGap(93, 93, 93)
+                                        .addComponent(txt_CategoryName, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGap(0, 0, Short.MAX_VALUE)))
+                        .addContainerGap())
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(jLabel2)
+                        .addGap(104, 104, 104))))
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 270, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGap(67, 67, 67)
+                        .addComponent(jLabel1)
+                        .addGap(17, 17, 17))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txt_CategoryId, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGap(25, 25, 25)
+                        .addComponent(jLabel7))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGap(18, 18, 18)
+                        .addComponent(txt_CategoryName, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(34, 34, 34)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel3)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btn_clear)
+                .addGap(18, 18, 18)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btn_insert, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btn_update, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btn_delete, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(211, 211, 211))
+        );
+
+        jTable_Products.setBackground(new java.awt.Color(204, 204, 204));
+        jTable_Products.setFont(new java.awt.Font("Calibri", 0, 14)); // NOI18N
+        jTable_Products.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "Category ID", "Category Name", "Description"
+            }
+        ));
+        jTable_Products.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        jTable_Products.setGridColor(new java.awt.Color(255, 255, 255));
+        jTable_Products.setRowHeight(20);
+        jTable_Products.setRowMargin(2);
+        jTable_Products.setSelectionBackground(new java.awt.Color(204, 204, 255));
+        jTable_Products.setSelectionForeground(new java.awt.Color(0, 0, 0));
+        jTable_Products.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTable_ProductsMouseClicked(evt);
+            }
+        });
+        jScrollPane2.setViewportView(jTable_Products);
+
+        btn_first.setBackground(new java.awt.Color(255, 255, 255));
+        btn_first.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Image/first.png"))); // NOI18N
+        btn_first.setText("First");
+        btn_first.setIconTextGap(15);
+        btn_first.setPreferredSize(new java.awt.Dimension(100, 30));
+        btn_first.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_firstActionPerformed(evt);
+            }
+        });
+
+        btn_previous.setBackground(new java.awt.Color(255, 255, 255));
+        btn_previous.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Image/previous.png"))); // NOI18N
+        btn_previous.setText("Previous");
+        btn_previous.setIconTextGap(15);
+        btn_previous.setPreferredSize(new java.awt.Dimension(100, 30));
+        btn_previous.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_previousActionPerformed(evt);
+            }
+        });
+
+        btn_next.setBackground(new java.awt.Color(255, 255, 255));
+        btn_next.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Image/next.png"))); // NOI18N
+        btn_next.setText("Next");
+        btn_next.setIconTextGap(15);
+        btn_next.setPreferredSize(new java.awt.Dimension(100, 30));
+        btn_next.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_nextActionPerformed(evt);
+            }
+        });
+
+        btn_last.setBackground(new java.awt.Color(255, 255, 255));
+        btn_last.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Image/last.png"))); // NOI18N
+        btn_last.setText("Last");
+        btn_last.setIconTextGap(15);
+        btn_last.setPreferredSize(new java.awt.Dimension(100, 30));
+        btn_last.setRolloverEnabled(false);
+        btn_last.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_lastActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(btn_first, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(btn_previous, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 41, Short.MAX_VALUE)
+                        .addComponent(btn_next, javax.swing.GroupLayout.PREFERRED_SIZE, 149, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(btn_last, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane2))
+                .addContainerGap())
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 541, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(51, 51, 51)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btn_first, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btn_previous, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btn_next, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btn_last, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(0, 0, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 684, Short.MAX_VALUE)
+        );
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void btn_insertActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_insertActionPerformed
+
+        if(checkAvailability()){
+            if(!txt_CategoryName.getText().isEmpty() && !txt_description.getText().isEmpty() ){
+            
+            try {
+                String CategoryName=txt_CategoryName.getText();
+                String Description=txt_description.getText();
+                
+                Connection con= ConnectionProvider.getInstance().getDBConnection();
+                String query="INSERT INTO category(categoryname,description) VALUES(?,?) ";
+                PreparedStatement ps=con.prepareStatement(query);
+                ps.setString(1, CategoryName);
+                ps.setString(2, Description);
+                
+                ps.executeUpdate();
+                txt_CategoryId.setText("");
+                txt_CategoryName.setText("");
+                txt_description.setText("");
+                showOnTable();
+                JOptionPane.showMessageDialog(null, "SuccessFully Inserted!!!");
+                
+                
+                } catch (SQLException ex) {
+                    Logger.getLogger(Category_Window.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            
+        
+            }
+            else{
+                JOptionPane.showMessageDialog(null, "Fields Cannot be Empty!!!");
+            }
+        }
+        
+        
+    }//GEN-LAST:event_btn_insertActionPerformed
+
+    private void btn_updateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_updateActionPerformed
+
+        if(checkInputs() && txt_CategoryId.getText()!=null){
+
+            
+                try {
+                    
+                    String UpdateQuery=null;
+                    PreparedStatement ps= null;
+                    
+                    Connection con= ConnectionProvider.getInstance().getDBConnection();
+                    
+                    UpdateQuery="UPDATE category SET categoryname=?,description=? WHERE categoryid=?";
+                    ps=con.prepareStatement(UpdateQuery);
+                    ps.setString(1, txt_CategoryName.getText());
+                    ps.setString(2, txt_description.getText());
+                    ps.setInt(3, Integer.parseInt(txt_CategoryId.getText()));
+                    ps.executeUpdate();
+                    
+                    showOnTable();
+                    JOptionPane.showMessageDialog(null, "Successfully Updated!!!");
+                    
+                    
+                } catch (SQLException ex) {
+                    Logger.getLogger(Category_Window.class.getName()).log(Level.SEVERE,null, ex);
+                }
+
+            
+
+        }
+    }//GEN-LAST:event_btn_updateActionPerformed
+
+    //Comman variable to hold Position
+    int pos =0;
+    
+    private void btn_deleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_deleteActionPerformed
+
+        if(!txt_CategoryId.getText().equals("")){
+
+            try{
+                Integer.parseInt(txt_CategoryId.getText());
+            }catch(Exception e){
+                JOptionPane.showMessageDialog(null, "Invalid Product ID!!!");
+            }
+
+            try {
+                Connection con= ConnectionProvider.getInstance().getDBConnection();
+
+                String DeleteQuery="DELETE FROM category WHERE categoryid=?";
+                PreparedStatement ps=con.prepareStatement(DeleteQuery);
+                ps.setInt(1, Integer.parseInt(txt_CategoryId.getText()));
+                ps.executeUpdate();
+                showOnTable();
+                showItems(pos);
+                JOptionPane.showMessageDialog(null, "Successfully Deleted!!!");
+
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(null, ex.getMessage());
+                //Logger.getLogger(Product_Window.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        }
+        else{
+            JOptionPane.showMessageDialog(null, "Delete unsuccessful : Product ID cannot be Empty");
+        }
+    }//GEN-LAST:event_btn_deleteActionPerformed
+
+    private void jTable_ProductsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable_ProductsMouseClicked
+        
+        btn_insert.setEnabled(false);
+        btn_update.setEnabled(true);
+        btn_delete.setEnabled(true);
+        int index=jTable_Products.getSelectedRow();
+        showItems(index);
+    }//GEN-LAST:event_jTable_ProductsMouseClicked
+
+    private void txt_CategoryIdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_CategoryIdActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txt_CategoryIdActionPerformed
+
+    private void btn_firstActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_firstActionPerformed
+
+        this.setBackground(Color.WHITE);
+        pos = 0;
+        showItems(pos);
+    }//GEN-LAST:event_btn_firstActionPerformed
+
+    private void btn_previousActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_previousActionPerformed
+
+        this.setBackground(Color.WHITE);
+        pos--;
+
+        if(pos<0){
+            pos =0;
+        }
+
+        showItems(pos);
+    }//GEN-LAST:event_btn_previousActionPerformed
+
+    private void btn_nextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_nextActionPerformed
+
+        this.setBackground(Color.WHITE);
+        pos++;
+
+        if(pos>=getCategories().size()){
+            pos=getCategories().size()-1;
+        }
+
+        showItems(pos);
+    }//GEN-LAST:event_btn_nextActionPerformed
+
+    private void btn_lastActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_lastActionPerformed
+
+        this.setBackground(Color.WHITE);
+        pos = getCategories().size()-1;
+        showItems(pos);
+    }//GEN-LAST:event_btn_lastActionPerformed
+
+    private void btn_clearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_clearActionPerformed
+        
+        txt_CategoryId.setText("");
+        txt_CategoryName.setText("");
+        txt_description.setText("");
+        
+        btn_update.setEnabled(false);
+        btn_delete.setEnabled(false);
+        btn_insert.setEnabled(true);
+    }//GEN-LAST:event_btn_clearActionPerformed
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(Category_Window.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(Category_Window.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(Category_Window.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(Category_Window.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new Category_Window().setVisible(true);
+            }
+        });
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btn_clear;
+    private javax.swing.JButton btn_delete;
+    private javax.swing.JButton btn_first;
+    private javax.swing.JButton btn_insert;
+    private javax.swing.JButton btn_last;
+    private javax.swing.JButton btn_next;
+    private javax.swing.JButton btn_previous;
+    private javax.swing.JButton btn_update;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JTable jTable_Products;
+    private javax.swing.JTextField txt_CategoryId;
+    private javax.swing.JTextField txt_CategoryName;
+    private javax.swing.JTextArea txt_description;
+    // End of variables declaration//GEN-END:variables
+}
